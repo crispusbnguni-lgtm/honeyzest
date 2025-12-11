@@ -11,14 +11,46 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Lenis from 'lenis';
 
-// --- 1. NEW IMPORT FOR SNOWFALL ---
-import Snowfall from 'react-snowfall';
+// Removed: import Snowfall from 'react-snowfall'; (Causing build errors)
 
 // Import External Pages
 import Cart from './Cart';
 import AdminDashboard from './AdminDashboard';
 import AuthPage from './AuthPage';
 import UserProfile from './UserProfile';
+
+// --- NEW COMPONENT: CSS SNOW OVERLAY (No Install Needed) ---
+const SnowOverlay = () => {
+  // Create 50 snowflakes with random positions and speeds
+  const flakes = Array.from({ length: 50 }).map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}vw`,
+    animationDuration: `${Math.random() * 3 + 2}s`, // Random speed 2s-5s
+    animationDelay: `${Math.random() * 5}s`,
+    fontSize: `${Math.random() * 1.5 + 1}rem`, // Random size
+    opacity: Math.random() * 0.5 + 0.3
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+      {flakes.map((flake) => (
+        <div 
+          key={flake.id} 
+          className="snowflake"
+          style={{
+            left: flake.left,
+            animationDuration: flake.animationDuration,
+            animationDelay: flake.animationDelay,
+            fontSize: flake.fontSize,
+            opacity: flake.opacity
+          }}
+        >
+          ❄
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // --- ANIMATION CONFIGURATION ---
 const pageVariants = {
@@ -127,8 +159,6 @@ const Navbar = () => {
         <Link to="/contact" className="hover:text-honey-500 transition">{t('contact')}</Link>
       </div>
       <div className="flex items-center gap-3 relative">
-        
-        {/* Settings Dropdown with Auto-Close */}
         <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
             <button onClick={() => setShowSettings(!showSettings)} className="flex items-center gap-1 bg-honey-100 dark:bg-gray-800 px-3 py-2 rounded-full text-xs font-bold hover:bg-honey-200 transition">
                 <Globe size={14}/> {language.toUpperCase()} / {currency} <ChevronDown size={12}/>
@@ -166,18 +196,20 @@ const Navbar = () => {
   );
 };
 
-// --- PAGES ---
+// --- PAGES (Home, Catalog, Contact, etc.) ---
+// ... (Your page components remain exactly the same as before, I will skip them for brevity but keep them in your file) ...
+
+// IMPORTANT: Re-paste your Home, Catalog, Contact, Blog, FAQ, Privacy, Terms, Footer components here if you delete them.
+// For this copy-paste, I assume they are below or imported. If they are in this file, DO NOT DELETE THEM.
 
 const Home = () => {
     const { t, aboutInfo } = useContext(StoreContext);
-    
     return (
         <div className="relative pt-20 px-4 min-h-screen flex flex-col items-center justify-center overflow-hidden perspective-1000">
             <FloatingHexagon delay={0} x="10%" y="20%" size={80} />
             <FloatingHexagon delay={2} x="80%" y="15%" size={120} />
             <FloatingHexagon delay={4} x="70%" y="70%" size={60} />
             <FloatingHexagon delay={1} x="20%" y="60%" size={100} />
-            
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="glass-panel p-8 md:p-16 rounded-[3rem] text-center max-w-4xl w-full relative z-10 border border-white/50 dark:border-white/10 shadow-2xl shadow-honey-500/10">
                 <AdminEditBtn label="Edit Home" />
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="inline-block px-4 py-1 mb-6 rounded-full bg-honey-100 dark:bg-honey-900/50 text-honey-700 dark:text-honey-400 text-xs font-bold uppercase tracking-widest border border-honey-200 dark:border-honey-800">Premium Kenyan Honey</motion.div>
@@ -191,42 +223,40 @@ const Home = () => {
         </div>
     );
 };
-
+// (Keep Catalog, Contact, Blog, FAQ, Privacy, Terms, Footer as they were...)
+// I am including Catalog and Footer here to ensure the file is complete for you.
 const Catalog = () => {
-  const { products, addToCart, formatPrice, t, addProductReview } = useContext(StoreContext);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState("All");
-  const [expandedProduct, setExpandedProduct] = useState(null); 
-  const [newReview, setNewReview] = useState({ rating: 5, text: "" });
-
-  const filteredProducts = products.filter(p => (category === "All" || p.category === category) && p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  const handleReviewSubmit = (e, id) => { e.preventDefault(); addProductReview(id, { user: "Guest User", ...newReview }); setNewReview({ rating: 5, text: "" }); };
-
-  return (
-    <div className="pt-32 px-4 max-w-7xl mx-auto pb-20 relative">
-      <AdminEditBtn label="Manage Products" />
-      <div className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between glass-panel p-4 rounded-[2rem]">
-          <div className="relative w-full md:w-1/3"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20}/><input type="text" placeholder={t('search')} className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 border-none outline-none dark:text-white" onChange={(e) => setSearchTerm(e.target.value)} /></div>
-          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">{["All", "Raw", "Creamed", "Infused"].map(cat => (<button key={cat} onClick={() => setCategory(cat)} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${category === cat ? 'bg-honey-500 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}>{cat}</button>))}</div>
+    const { products, addToCart, formatPrice, t, addProductReview } = useContext(StoreContext);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [category, setCategory] = useState("All");
+    const [expandedProduct, setExpandedProduct] = useState(null); 
+    const [newReview, setNewReview] = useState({ rating: 5, text: "" });
+    const filteredProducts = products.filter(p => (category === "All" || p.category === category) && p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const handleReviewSubmit = (e, id) => { e.preventDefault(); addProductReview(id, { user: "Guest User", ...newReview }); setNewReview({ rating: 5, text: "" }); };
+    return (
+      <div className="pt-32 px-4 max-w-7xl mx-auto pb-20 relative">
+        <AdminEditBtn label="Manage Products" />
+        <div className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between glass-panel p-4 rounded-[2rem]">
+            <div className="relative w-full md:w-1/3"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20}/><input type="text" placeholder={t('search')} className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 border-none outline-none dark:text-white" onChange={(e) => setSearchTerm(e.target.value)} /></div>
+            <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">{["All", "Raw", "Creamed", "Infused"].map(cat => (<button key={cat} onClick={() => setCategory(cat)} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${category === cat ? 'bg-honey-500 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}>{cat}</button>))}</div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {filteredProducts.map(product => {
+              const avgRating = product.reviews.length ? (product.reviews.reduce((a,b)=>a+b.rating,0)/product.reviews.length).toFixed(1) : "New";
+              return (
+                <motion.div layout whileHover={{ y: -10 }} key={product.id} className="glass-card p-4 rounded-[2.5rem] flex flex-col h-full group">
+                  <div className="relative overflow-hidden rounded-[2rem] mb-4"><img src={product.image} alt={product.name} className="w-full h-64 object-cover transition duration-700 group-hover:scale-110"/><span className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Star size={12} className="text-orange-500 fill-orange-500"/> {avgRating}</span></div>
+                  <div className="flex justify-between items-start mb-2"><div><h3 className="text-xl font-bold dark:text-white">{product.name}</h3><p className="text-xs text-gray-500 uppercase font-bold tracking-wide">{product.category}</p></div><span className="text-honey-600 dark:text-honey-400 font-black text-lg">{formatPrice(product.price)}</span></div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-grow line-clamp-2">{product.desc}</p>
+                  <div className="flex gap-2 mt-auto"><button onClick={() => addToCart(product.id)} className="flex-1 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-xl font-bold hover:opacity-80 transition shadow-lg">{t('addToCart')}</button><button onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)} className="p-3 bg-honey-100 dark:bg-gray-800 text-honey-600 rounded-xl font-bold">{expandedProduct === product.id ? "Close" : "Review"}</button></div>
+                  <AnimatePresence>{expandedProduct === product.id && (<motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:"auto"}} exit={{opacity:0, height:0}} className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"><form onSubmit={(e) => handleReviewSubmit(e, product.id)} className="mb-4"><div className="flex gap-2 mb-2">{[1,2,3,4,5].map(star => (<Star key={star} size={16} className={`cursor-pointer ${star <= newReview.rating ? "fill-orange-400 text-orange-400" : "text-gray-300"}`} onClick={() => setNewReview({...newReview, rating: star})}/>))}</div><input className="w-full text-sm p-2 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-white border-none outline-none mb-2" placeholder="Describe the taste..." value={newReview.text} onChange={e=>setNewReview({...newReview, text: e.target.value})} required/><button className="text-xs bg-honey-500 text-white px-3 py-1 rounded-lg font-bold">Submit</button></form><div className="max-h-32 overflow-y-auto space-y-2">{product.reviews.map((r, i) => (<div key={i} className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg"><div className="flex justify-between items-center"><span className="text-xs font-bold dark:text-white">{r.user}</span><span className="text-[10px] flex items-center text-orange-400"><Star size={8} fill="currentColor"/> {r.rating}</span></div><p className="text-xs text-gray-600 dark:text-gray-300">{r.text}</p></div>))}</div></motion.div>)}</AnimatePresence>
+                </motion.div>
+              );
+          })}
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {filteredProducts.map(product => {
-            const avgRating = product.reviews.length ? (product.reviews.reduce((a,b)=>a+b.rating,0)/product.reviews.length).toFixed(1) : "New";
-            return (
-              <motion.div layout whileHover={{ y: -10 }} key={product.id} className="glass-card p-4 rounded-[2.5rem] flex flex-col h-full group">
-                <div className="relative overflow-hidden rounded-[2rem] mb-4"><img src={product.image} alt={product.name} className="w-full h-64 object-cover transition duration-700 group-hover:scale-110"/><span className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><Star size={12} className="text-orange-500 fill-orange-500"/> {avgRating}</span></div>
-                <div className="flex justify-between items-start mb-2"><div><h3 className="text-xl font-bold dark:text-white">{product.name}</h3><p className="text-xs text-gray-500 uppercase font-bold tracking-wide">{product.category}</p></div><span className="text-honey-600 dark:text-honey-400 font-black text-lg">{formatPrice(product.price)}</span></div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-grow line-clamp-2">{product.desc}</p>
-                <div className="flex gap-2 mt-auto"><button onClick={() => addToCart(product.id)} className="flex-1 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-xl font-bold hover:opacity-80 transition shadow-lg">{t('addToCart')}</button><button onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)} className="p-3 bg-honey-100 dark:bg-gray-800 text-honey-600 rounded-xl font-bold">{expandedProduct === product.id ? "Close" : "Review"}</button></div>
-                <AnimatePresence>{expandedProduct === product.id && (<motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:"auto"}} exit={{opacity:0, height:0}} className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"><form onSubmit={(e) => handleReviewSubmit(e, product.id)} className="mb-4"><div className="flex gap-2 mb-2">{[1,2,3,4,5].map(star => (<Star key={star} size={16} className={`cursor-pointer ${star <= newReview.rating ? "fill-orange-400 text-orange-400" : "text-gray-300"}`} onClick={() => setNewReview({...newReview, rating: star})}/>))}</div><input className="w-full text-sm p-2 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-white border-none outline-none mb-2" placeholder="Describe the taste..." value={newReview.text} onChange={e=>setNewReview({...newReview, text: e.target.value})} required/><button className="text-xs bg-honey-500 text-white px-3 py-1 rounded-lg font-bold">Submit</button></form><div className="max-h-32 overflow-y-auto space-y-2">{product.reviews.map((r, i) => (<div key={i} className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg"><div className="flex justify-between items-center"><span className="text-xs font-bold dark:text-white">{r.user}</span><span className="text-[10px] flex items-center text-orange-400"><Star size={8} fill="currentColor"/> {r.rating}</span></div><p className="text-xs text-gray-600 dark:text-gray-300">{r.text}</p></div>))}</div></motion.div>)}</AnimatePresence>
-              </motion.div>
-            );
-        })}
-      </div>
-    </div>
-  );
+    );
 };
-
 const Contact = () => {
     const { contactInfo } = useContext(StoreContext);
     return (
@@ -252,12 +282,10 @@ const Contact = () => {
       </div>
     );
 };
-
 const Blog = () => {
     const { blogs, addComment } = useContext(StoreContext);
     const [commentInputs, setCommentInputs] = useState({});
     const handleCommentSubmit = (blogId, e) => { e.preventDefault(); if(commentInputs[blogId]) { addComment(blogId, commentInputs[blogId]); setCommentInputs({...commentInputs, [blogId]: ""}); } };
-
     return (
         <div className="pt-32 px-4 max-w-5xl mx-auto pb-20 relative">
             <AdminEditBtn label="Manage Blogs" />
@@ -280,12 +308,10 @@ const Blog = () => {
         </div>
     );
 };
-
 const FAQ = () => {
   const { legalInfo } = useContext(StoreContext);
   const [activeIndex, setActiveIndex] = useState(null);
   const faqs = legalInfo?.faqs || [];
-
   return (
     <div className="pt-32 px-4 max-w-3xl mx-auto pb-20 relative">
       <div className="glass-panel p-6 rounded-[2rem] mb-6 relative">
@@ -306,7 +332,6 @@ const FAQ = () => {
     </div>
   );
 };
-
 const Privacy = () => {
     const { legalInfo } = useContext(StoreContext);
     return (
@@ -319,7 +344,6 @@ const Privacy = () => {
       </div>
     );
 };
-
 const Terms = () => {
     const { legalInfo } = useContext(StoreContext);
     return (
@@ -332,8 +356,6 @@ const Terms = () => {
       </div>
     );
 };
-
-// --- FOOTER ---
 const Footer = () => (
   <footer className="mt-auto pt-10 pb-6 px-4">
     <div className="glass-panel rounded-[2.5rem] p-8 max-w-7xl mx-auto">
@@ -363,21 +385,10 @@ const App = () => {
     <div className="min-h-screen w-full relative flex flex-col">
        <ToastContainer toastStyle={{ borderRadius: "1rem", background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)" }} />
        
-       {/* --- 2. ADD THE SNOWFALL COMPONENT HERE (Foreground) --- */}
-       <Snowfall 
-         style={{
-           position: 'fixed',
-           width: '100vw',
-           height: '100vh',
-           zIndex: 9999, // Ensures it falls ON TOP of your Navbar and Content
-         }}
-         snowflakeCount={150} // Number of flakes
-         radius={[0.5, 3.0]}  // Min and Max size of flakes
-       />
-       {/* -------------------------------------------------------- */}
-
+       {/* --- NEW CSS SNOW OVERLAY (No Install Needed) --- */}
+       <SnowOverlay />
+       
        <div className="fixed inset-0 z-[-1] overflow-hidden">
-            {/* Fixed the src URL below which was missing */}
             <iframe
                 className="absolute top-1/2 left-1/2 w-[150%] h-[150%] -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
                 src="https://www.youtube.com/embed/J7gqF691kSQ?autoplay=1&mute=1&loop=1&playlist=J7gqF691kSQ&controls=0&showinfo=0&rel=0"

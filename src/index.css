@@ -63,3 +63,21 @@ html {
   @apply bg-white/60 dark:bg-gray-800/60 -translate-y-2;
   box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
 }
+/* --- CHRISTMAS SNOW EFFECT --- */
+.snowflake {
+  position: fixed;
+  top: -20px;
+  color: white;
+  z-index: 9999;
+  pointer-events: none; /* Allows clicking through snow */
+  user-select: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  text-shadow: 0 0 5px rgba(0,0,0,0.2); /* Slight shadow to see on white backgrounds */
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10vh) translateX(0); opacity: 0.8; }
+  100% { transform: translateY(110vh) translateX(20px); opacity: 0.3; }
+}
