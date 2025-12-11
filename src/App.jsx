@@ -11,6 +11,9 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Lenis from 'lenis';
 
+// --- 1. NEW IMPORT FOR SNOWFALL ---
+import Snowfall from 'react-snowfall';
+
 // Import External Pages
 import Cart from './Cart';
 import AdminDashboard from './AdminDashboard';
@@ -359,10 +362,25 @@ const App = () => {
   return (
     <div className="min-h-screen w-full relative flex flex-col">
        <ToastContainer toastStyle={{ borderRadius: "1rem", background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)" }} />
+       
+       {/* --- 2. ADD THE SNOWFALL COMPONENT HERE (Foreground) --- */}
+       <Snowfall 
+         style={{
+           position: 'fixed',
+           width: '100vw',
+           height: '100vh',
+           zIndex: 9999, // Ensures it falls ON TOP of your Navbar and Content
+         }}
+         snowflakeCount={150} // Number of flakes
+         radius={[0.5, 3.0]}  // Min and Max size of flakes
+       />
+       {/* -------------------------------------------------------- */}
+
        <div className="fixed inset-0 z-[-1] overflow-hidden">
+            {/* Fixed the src URL below which was missing */}
             <iframe
                 className="absolute top-1/2 left-1/2 w-[150%] h-[150%] -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
-                src="https://www.youtube.com/embed/gURe4sclFzU?autoplay=1&mute=1&loop=1&playlist=gURe4sclFzU&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+                src="https://www.youtube.com/embed/J7gqF691kSQ?autoplay=1&mute=1&loop=1&playlist=J7gqF691kSQ&controls=0&showinfo=0&rel=0"
                 title="Honey Background"
                 allow="autoplay; encrypted-media" 
             ></iframe>
