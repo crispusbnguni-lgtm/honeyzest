@@ -6,252 +6,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HoneyZest | Premium Honey</title> 
     
-    <!-- 1. PRELOAD PARTICLES (Prevents lag) -->
+    <!-- 1. LOAD PARTICLES ENGINE -->
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-    <script type="module" crossorigin src="/assets/index-DhJegbq9.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BV2zvQa6.css">
+    <script type="module" crossorigin src="/assets/index-DKIWevcV.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BUnpDFoU.css">
   </head>
   
   <body>
-    <!-- 2. REACT APP MOUNT POINT (MUST BE HERE) -->
-    <div id="root" style="position: relative; z-index: 10;"></div>
-    
-    <!-- 3. REACT SCRIPT -->
+    <!-- ================================================== -->
+    <!-- LAYER 1: YOUR WEBSITE (MUST BE Z-INDEX 10)         -->
+    <!-- ================================================== -->
+    <div id="root" style="position: relative; z-index: 10; background: transparent;"></div>
 
     <!-- ================================================== -->
-    <!-- HONEYZEST ULTIMATE ATMOSPHERE ENGINE (v3.0)        -->
+    <!-- LAYER 2: HONEYZEST ATMOSPHERE ENGINE               -->
     <!-- ================================================== -->
 
     <style>
-      /* --- GLOBAL FIXES --- */
-      body { margin: 0; overflow-x: hidden; } /* Prevents scrollbars from effects */
-      canvas { pointer-events: none !important; } /* CRITICAL: Allows clicking through rain */
-
-      /* --- GEAR ICON (Top Right) --- */
+      /* FORCE PARTICLES TO BE TRANSPARENT & BEHIND CONTENT */
+      #tsparticles {
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 1; /* Below the website content */
+        pointer-events: none !important; /* Click through rain */
+      }
+      
+      /* GEAR BUTTON */
       #hz-gear-btn {
         position: fixed; top: 20px; right: 20px;
-        width: 48px; height: 48px;
-        background: rgba(255, 255, 255, 0.1);
+        width: 50px; height: 50px;
+        background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 2px solid rgba(255,255,255,0.5);
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        cursor: pointer; z-index: 99999;
-        font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer; z-index: 99999; /* Always on top */
+        font-size: 26px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        transition: transform 0.4s ease;
       }
-      #hz-gear-btn:hover { transform: rotate(180deg) scale(1.1); background: #fff; color: #eab308; }
+      #hz-gear-btn:hover { transform: rotate(90deg) scale(1.1); background: #fff; }
 
-      /* --- SETTINGS DASHBOARD --- */
-      #hz-settings-panel {
+      /* SETTINGS PANEL */
+      #hz-panel {
         position: fixed; top: 80px; right: 20px;
-        width: 340px;
-        background: #1a1a1a;
-        color: #e5e5e5;
+        width: 320px;
+        background: rgba(15, 23, 42, 0.95); /* Dark Blue/Black */
+        color: #fff;
         border-radius: 16px;
-        border: 1px solid #333;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.1);
         z-index: 99998;
-        font-family: system-ui, -apple-system, sans-serif;
-        transform: scale(0.9) translateY(-20px);
-        opacity: 0; pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex; flex-direction: column;
-        max-height: 80vh;
+        font-family: sans-serif;
+        transform: scale(0.95); opacity: 0; pointer-events: none;
+        transition: all 0.3s ease;
+        max-height: 80vh; overflow-y: auto;
       }
-      #hz-settings-panel.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+      #hz-panel.active { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-      /* HEADER */
-      .hz-panel-header {
-        padding: 16px 20px;
-        background: linear-gradient(135deg, #eab308 0%, #b45309 100%);
-        border-radius: 15px 15px 0 0;
-        display: flex; justify-content: space-between; align-items: center;
-      }
-      .hz-panel-header h3 { margin: 0; font-size: 14px; font-weight: 800; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
-
-      /* BODY SCROLL */
-      .hz-panel-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
-
-      /* CONTROLS */
-      .hz-control-group { margin-bottom: 20px; }
-      .hz-label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; margin-bottom: 8px; display: block; }
+      /* UI ELEMENTS */
+      .hz-header { padding: 15px; background: linear-gradient(90deg, #eab308, #ca8a04); border-radius: 16px 16px 0 0; display:flex; justify-content:space-between; align-items:center;}
+      .hz-body { padding: 20px; }
+      .hz-row { margin-bottom: 15px; }
+      .hz-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 5px; }
       
-      .hz-select {
-        width: 100%; background: #262626; color: #fff; border: 1px solid #404040;
-        padding: 10px; border-radius: 8px; font-size: 13px; outline: none; cursor: pointer;
-      }
-      .hz-select:focus { border-color: #eab308; }
-      .hz-select:disabled { opacity: 0.5; cursor: not-allowed; }
-
-      /* TOGGLES */
-      .hz-toggle-box {
-        display: flex; justify-content: space-between; align-items: center;
-        background: #262626; padding: 12px; border-radius: 8px; border: 1px solid #333; margin-bottom: 10px;
-      }
-      .hz-toggle-title { font-size: 13px; font-weight: 600; }
-      .hz-toggle-desc { font-size: 10px; color: #888; }
+      select { width: 100%; padding: 10px; background: #334155; color: #fff; border: 1px solid #475569; border-radius: 8px; }
       
-      /* SLIDER */
-      input[type=range] { width: 100%; accent-color: #eab308; cursor: pointer; }
-
-      /* OVERLAYS (Night/Mist/Flash) */
-      .hz-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; transition: opacity 1.5s ease; opacity: 0; }
-      .hz-night-mode { background: linear-gradient(to bottom, rgba(5, 10, 30, 0.8), rgba(0,0,0,0.5)); }
-      .hz-mist-mode { background: rgba(200, 220, 255, 0.1); backdrop-filter: blur(2px); }
-      .hz-flash { background: #fff; z-index: 9999; transition: opacity 0.05s; }
-      .hz-visible { opacity: 1 !important; }
+      /* NIGHT & MIST OVERLAYS */
+      .hz-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; opacity: 0; transition: opacity 2s; }
+      .hz-night { background: rgba(0, 0, 0, 0.6); } /* Darkens screen */
+      .active { opacity: 1 !important; }
     </style>
 
-    <!-- 4. AUDIO ASSETS (Hidden) -->
-    <audio id="sfx-rain" loop src="https://assets.mixkit.co/active_storage/sfx/2497/2497-preview.mp3"></audio>
-    <audio id="sfx-thunder" src="https://assets.mixkit.co/active_storage/sfx/1273/1273-preview.mp3"></audio>
-    <audio id="sfx-wind" loop src="https://assets.mixkit.co/active_storage/sfx/1483/1483-preview.mp3"></audio>
-
-    <!-- 5. HTML UI ELEMENTS -->
-    <div id="hz-layer-night" class="hz-overlay hz-night-mode"></div>
-    <div id="hz-layer-mist" class="hz-overlay hz-mist-mode"></div>
-    <div id="hz-layer-flash" class="hz-overlay hz-flash"></div>
-
+    <!-- UI STRUCTURE -->
+    <div id="hz-layer-night" class="hz-overlay hz-night"></div>
+    
     <div id="hz-gear-btn" onclick="toggleSettings()">⚙️</div>
 
-    <div id="hz-settings-panel">
-      <div class="hz-panel-header">
-        <h3>Atmosphere Engine</h3>
-        <div style="cursor:pointer" onclick="toggleSettings()">✕</div>
+    <div id="hz-panel">
+      <div class="hz-header">
+        <strong style="color:white; font-size:14px;">HoneyZest Smart Settings</strong>
+        <span style="cursor:pointer; font-size:18px;" onclick="toggleSettings()">×</span>
       </div>
-      
-      <div class="hz-panel-body">
+      <div class="hz-body">
         
-        <!-- AUTO MODE SWITCH -->
-        <div class="hz-toggle-box">
-          <div>
-            <div class="hz-toggle-title">✨ Smart Auto-Pilot</div>
-            <div class="hz-toggle-desc" id="hz-location-status">Detecting...</div>
-          </div>
-          <input type="checkbox" id="hz-auto-switch" checked onchange="toggleAuto(this.checked)" style="width:18px; height:18px;">
+        <!-- AUTO TOGGLE -->
+        <div class="hz-row" style="display:flex; justify-content:space-between;">
+          <span style="font-size:13px;">✨ Live Auto-Detect</span>
+          <input type="checkbox" id="hz-auto" checked onchange="toggleAuto(this.checked)">
         </div>
+        <div id="hz-status" style="font-size:11px; color:#22d3ee; margin-bottom:15px;">Locating...</div>
 
-        <!-- INTENSITY SLIDER -->
-        <div class="hz-control-group">
-          <label class="hz-label">Effect Intensity</label>
-          <input type="range" id="hz-intensity" min="10" max="200" value="80" oninput="manualUpdate()">
-        </div>
-
-        <!-- SOUND TOGGLE -->
-        <div class="hz-toggle-box">
-          <div>
-            <div class="hz-toggle-title">🔊 Immersive Sound</div>
-            <div class="hz-toggle-desc">Rain & Wind Ambience</div>
-          </div>
-          <input type="checkbox" id="hz-sound-switch" onchange="toggleSound(this.checked)" style="width:18px; height:18px;">
-        </div>
-
-        <!-- WEATHER SELECTOR -->
-        <div class="hz-control-group">
-          <label class="hz-label">Weather Mode</label>
-          <select id="hz-weather-select" class="hz-select" onchange="manualUpdate()" disabled>
-            <option value="clear">☀️ Clear / Sunny</option>
-            <option value="rain">🌧️ Rain Shower</option>
-            <option value="thunder">⚡ Heavy Thunderstorm</option>
-            <option value="snow">❄️ Snowfall</option>
-            <option value="wind">🍃 Windy / Storm</option>
-            <option value="mist">🌫️ Fog / Mist</option>
-            <option value="confetti">🎉 Celebration / Party</option>
-            <option value="halloween">🎃 Halloween</option>
-            <option value="love">❤️ Valentine's / Love</option>
+        <!-- WEATHER -->
+        <div class="hz-row">
+          <label class="hz-label">Weather Effect</label>
+          <select id="hz-weather" disabled onchange="manualUpdate()">
+            <option value="clear">☀️ Sunny / Clear</option>
+            <option value="rain">🌧️ Rain</option>
+            <option value="snow">❄️ Snow</option>
+            <option value="wind">🍃 Windy</option>
+            <option value="confetti">🎉 Party Mode</option>
           </select>
         </div>
 
-        <!-- CURRENCY & LANGUAGE -->
-        <div class="hz-control-group">
-          <label class="hz-label">Regional Settings</label>
-          <select id="hz-currency-select" class="hz-select" onchange="manualUpdate()" disabled style="margin-bottom:8px;">
-            <optgroup label="Popular">
-              <option value="KES">🇰🇪 KES (Kenya)</option>
-              <option value="USD">🇺🇸 USD (USA)</option>
-              <option value="EUR">🇪🇺 EUR (Europe)</option>
-              <option value="GBP">🇬🇧 GBP (UK)</option>
-            </optgroup>
-            <optgroup label="Global">
-              <option value="NGN">🇳🇬 NGN (Nigeria)</option>
-              <option value="ZAR">🇿🇦 ZAR (South Africa)</option>
-              <option value="GHS">🇬🇭 GHS (Ghana)</option>
-              <option value="INR">🇮🇳 INR (India)</option>
-              <option value="AED">🇦🇪 AED (Dubai)</option>
-              <option value="CNY">🇨🇳 CNY (China)</option>
-              <option value="JPY">🇯🇵 JPY (Japan)</option>
-            </optgroup>
+        <!-- CURRENCY -->
+        <div class="hz-row">
+          <label class="hz-label">Currency</label>
+          <select id="hz-currency" disabled onchange="manualUpdate()">
+            <option value="KES">🇰🇪 KES (Kenya)</option>
+            <option value="USD">🇺🇸 USD (Global)</option>
+            <option value="EUR">🇪🇺 EUR (Europe)</option>
+            <option value="GBP">🇬🇧 GBP (UK)</option>
           </select>
-          
-          <select id="hz-lang-select" class="hz-select" onchange="manualUpdate()" disabled>
+        </div>
+        
+        <!-- LANGUAGE -->
+        <div class="hz-row">
+          <label class="hz-label">Language</label>
+          <select id="hz-lang" disabled onchange="manualUpdate()">
             <option value="en">English</option>
             <option value="sw">Swahili</option>
             <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="es">Spanish</option>
-            <option value="ar">Arabic</option>
-            <option value="zh">Chinese</option>
           </select>
         </div>
 
       </div>
     </div>
 
-    <!-- 6. ENGINE SCRIPT -->
+    <!-- ENGINE LOGIC -->
     <script>
-      // === API & CONFIG ===
       const API_KEY = "cbcace2f2fd0530b63a92e3cd2ed6fe0";
-      const BOUNCE_TARGETS = "button, .btn, input[type='submit'], .card, img, nav, .logo, a";
-
+      // Selectors for bouncing
+      const BOUNCE_TARGETS = "button, .btn, input[type='submit'], .card, img, nav";
       let tsInstance;
-      let thunderTimer;
-      let currentTheme = 'clear';
 
-      // === UI FUNCTIONS ===
-      function toggleSettings() {
-        document.getElementById('hz-settings-panel').classList.toggle('active');
-      }
-
+      function toggleSettings() { document.getElementById('hz-panel').classList.toggle('active'); }
+      
       function toggleAuto(isAuto) {
-        const els = ['hz-weather-select', 'hz-currency-select', 'hz-lang-select'];
-        els.forEach(id => document.getElementById(id).disabled = isAuto);
-        
-        if (isAuto) {
-          runAutoDetect();
-        } else {
-          document.getElementById('hz-location-status').innerText = "Manual Control Mode";
-          manualUpdate();
-        }
-      }
-
-      function toggleSound(enabled) {
-        if(!enabled) {
-          document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
-        } else {
-          manualUpdate(); // Restart sounds based on current weather
-        }
+        document.querySelectorAll('select').forEach(s => s.disabled = isAuto);
+        if(isAuto) runAutoDetect();
+        else document.getElementById('hz-status').innerText = "Manual Mode Active";
       }
 
       function manualUpdate() {
-        const weather = document.getElementById('hz-weather-select').value;
-        const curr = document.getElementById('hz-currency-select').value;
-        const lang = document.getElementById('hz-lang-select').value;
-        const intensity = document.getElementById('hz-intensity').value;
-
-        applyTheme(weather, intensity);
-        
-        // Save prefs for React app to read
-        localStorage.setItem('hz_currency', curr);
-        localStorage.setItem('hz_lang', lang);
+        const w = document.getElementById('hz-weather').value;
+        loadTheme(w);
       }
 
-      // === PHYSICS ENGINE ===
-      function getBaseConfig() {
-        return {
-          fullScreen: { enable: true, zIndex: 1 }, // Changed to 1 (Low) to fix white screen
+      // --- PHYSICS CONFIG (FIXED VISIBILITY) ---
+      function getConfig(type) {
+        const config = {
+          fullScreen: { enable: true, zIndex: 1 }, // Z-INDEX 1 puts it BEHIND your content (which is 10)
+          background: { color: "transparent" }, // CRITICAL: Makes canvas invisible
           fpsLimit: 60,
-          background: { color: "transparent" }, // CRITICAL FIX FOR WHITE SCREEN
           particles: { move: { enable: true } },
           interactivity: {
             detectsOn: "window",
@@ -260,165 +167,90 @@
             }
           }
         };
-      }
 
-      async function applyTheme(type, intensity = 80) {
-        currentTheme = type;
-        const config = getBaseConfig();
-        const soundSwitch = document.getElementById('hz-sound-switch').checked;
-
-        // Reset Effects
-        clearInterval(thunderTimer);
-        document.getElementById('hz-layer-mist').classList.remove('hz-visible');
-        document.getElementById('hz-layer-night').classList.remove('hz-visible');
-        ['sfx-rain', 'sfx-wind'].forEach(id => document.getElementById(id).pause());
-
-        // 1. RAIN / THUNDER
-        if (type === 'rain' || type === 'thunder') {
+        if (type === 'rain') {
           config.particles = {
-            number: { value: intensity },
-            color: { value: "#a2d2ff" },
-            shape: { type: "line" },
-            opacity: { value: 0.7 },
-            size: { value: { min: 1, max: 3 } },
+            number: { value: 100 }, color: { value: "#a2d2ff" }, shape: { type: "line" },
+            opacity: { value: 0.7 }, size: { value: { min: 1, max: 3 } },
             move: { enable: true, speed: 20, direction: "bottom", gravity: { enable: true, acceleration: 15 }, straight: true }
           };
-          if (soundSwitch) document.getElementById('sfx-rain').play();
-          if (type === 'thunder') startThunder(soundSwitch);
-        }
-        
-        // 2. SNOW
-        else if (type === 'snow') {
+        } else if (type === 'snow') {
           config.particles = {
-            number: { value: intensity / 2 },
-            color: { value: "#fff" },
-            shape: { type: "circle" },
-            opacity: { value: 0.9 },
-            size: { value: { min: 2, max: 6 } },
+            number: { value: 50 }, color: { value: "#fff" }, shape: { type: "circle" },
+            opacity: { value: 0.8 }, size: { value: { min: 2, max: 5 } },
             move: { enable: true, speed: 3, direction: "bottom", random: true }
           };
-        }
-
-        // 3. WIND / STORM
-        else if (type === 'wind') {
+        } else if (type === 'wind') {
           config.particles = {
-            number: { value: 40 },
-            color: { value: ["#5e3a07", "#2f4f2f", "#8b5a2b"] },
+            number: { value: 30 }, color: { value: ["#5e3a07", "#2f4f2f"] },
             shape: { type: "polygon", options: { polygon: { sides: 3 } } },
             opacity: { value: 1 }, size: { value: { min: 3, max: 6 } },
-            move: { enable: true, speed: 35, direction: "right" }
+            move: { enable: true, speed: 30, direction: "right" }
           };
-          if (soundSwitch) document.getElementById('sfx-wind').play();
-        }
-
-        // 4. SPECIAL MODES
-        else if (type === 'confetti') {
+        } else if (type === 'confetti') {
           config.particles = {
-            number: { value: 80 },
-            color: { value: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00"] },
-            shape: { type: ["circle", "square"] },
-            move: { enable: true, speed: 10, direction: "bottom", outModes: "out" }
+            number: { value: 50 }, color: { value: ["#ff0000", "#00ff00", "#0000ff"] },
+            shape: { type: ["circle", "square"] }, size: { value: { min: 5, max: 10 } },
+            move: { enable: true, speed: 10, direction: "bottom" }
           };
+        } else {
+           // Clear
+           config.particles = { number: { value: 0 } };
         }
-        else if (type === 'halloween') {
-          config.particles = {
-            number: { value: 30 }, color: { value: "#000" },
-            shape: { type: "image", image: { src: "https://particles.js.org/images/fruits/bat.png", width: 100, height: 100 } },
-            size: { value: 20 }, move: { speed: 10, direction: "right", random: true }
-          };
-        }
-        else if (type === 'love') {
-           config.particles = {
-            number: { value: 40 }, color: { value: "#ff0000" },
-            shape: { type: "heart" }, size: { value: 10 },
-            move: { speed: 2, direction: "top", random: true }
-          };
-        }
-        
-        // 5. MIST
-        else if (type === 'mist') {
-          document.getElementById('hz-layer-mist').classList.add('hz-visible');
-          config.particles = { number: { value: 0 } };
-        }
+        return config;
+      }
 
-        // 6. CLEAR
-        else {
-           config.particles = {
-            number: { value: 15 }, color: { value: "#FFD700" },
-            shape: { type: "circle" }, opacity: { value: 0.3 },
-            move: { speed: 1, direction: "none", random: true }
-          };
-        }
-
-        // RELOAD ENGINE
+      async function loadTheme(theme) {
+        const config = getConfig(theme);
         if (tsInstance) { await tsInstance.load("tsparticles", config); }
         else { tsInstance = await tsParticles.load("tsparticles", config); }
-      }
-
-      function startThunder(playSound) {
-        thunderTimer = setInterval(() => {
-          if(Math.random() > 0.85) { // Flash chance
-            const flash = document.getElementById('hz-layer-flash');
-            flash.classList.add('hz-visible');
-            if(playSound) document.getElementById('sfx-thunder').play();
-            setTimeout(() => flash.classList.remove('hz-visible'), 150);
-          }
-        }, 2000);
-      }
-
-      // === AUTO DETECT LOGIC ===
-      function runAutoDetect() {
-        if (!navigator.geolocation) return;
         
+        // Night mode check
+        if(theme === 'clear') document.getElementById('hz-layer-night').classList.remove('active');
+      }
+
+      // --- AUTO DETECT ---
+      function runAutoDetect() {
+        if(!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(async (pos) => {
           const { latitude: lat, longitude: lon } = pos.coords;
           try {
             const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
             const data = await res.json();
             
-            // Country Logic
+            document.getElementById('hz-status').innerText = `Live: ${data.name}`;
+            
+            // Map Country to Currency
             const code = data.sys.country;
-            document.getElementById('hz-location-status').innerText = `Live in ${data.name}, ${code}`;
+            let curr = 'USD'; let lang = 'en';
+            if(code === 'KE') { curr = 'KES'; lang = 'sw'; } // Kenya Specifics
+            else if(['GB', 'UK'].includes(code)) curr = 'GBP';
+            else if(['FR','DE','IT'].includes(code)) curr = 'EUR';
             
-            // Map Currency
-            let c = 'USD'; let l = 'en';
-            if(code === 'KE') { c = 'KES'; l = 'sw'; }
-            else if(code === 'NG') c = 'NGN';
-            else if(code === 'ZA') c = 'ZAR';
-            else if(['GB','UK'].includes(code)) c = 'GBP';
-            else if(['FR','DE','IT','ES'].includes(code)) c = 'EUR';
-            
-            document.getElementById('hz-currency-select').value = c;
-            document.getElementById('hz-lang-select').value = l;
+            document.getElementById('hz-currency').value = curr;
+            document.getElementById('hz-lang').value = lang;
 
-            // Weather Logic
-            const id = data.weather[0].id;
-            let theme = 'clear';
-            if (id >= 200 && id <= 232) theme = 'thunder';
-            else if (id >= 300 && id <= 531) theme = 'rain';
-            else if (id >= 600 && id <= 622) theme = 'snow';
-            else if (id >= 700 && id <= 781) theme = 'mist';
-            else if (data.wind.speed > 10) theme = 'wind';
+            // Map Weather
+            const main = data.weather[0].main.toLowerCase();
+            let w = 'clear';
+            if(main.includes('rain')) w = 'rain';
+            else if(main.includes('snow')) w = 'snow';
+            else if(data.wind.speed > 10) w = 'wind';
             
+            document.getElementById('hz-weather').value = w;
+            loadTheme(w);
+
             // Night Check
             const isNight = (data.dt > data.sys.sunset || data.dt < data.sys.sunrise);
-            if(isNight) document.getElementById('hz-layer-night').classList.add('hz-visible');
-            else document.getElementById('hz-layer-night').classList.remove('hz-visible');
+            if(isNight) document.getElementById('hz-layer-night').classList.add('active');
+            else document.getElementById('hz-layer-night').classList.remove('active');
 
-            document.getElementById('hz-weather-select').value = theme;
-            applyTheme(theme);
-
-          } catch (e) { console.error(e); }
+          } catch(e) {}
         });
       }
 
-      // === STARTUP ===
-      window.onload = () => {
-        // Run after 2 seconds to allow React to mount
-        setTimeout(() => {
-          if(document.getElementById('hz-auto-switch').checked) runAutoDetect();
-        }, 2000);
-      };
+      // START
+      window.onload = () => { setTimeout(runAutoDetect, 2000); };
     </script>
   </body>
 </html>
