@@ -5,243 +5,253 @@
     <link rel="icon" type="image/png" href="/logo.png" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HoneyZest | Premium Honey</title> 
+    
+    <!-- 1. PRELOAD PARTICLES (Prevents lag) -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
     <script type="module" crossorigin src="/assets/index-DhJegbq9.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BV2zvQa6.css">
   </head>
+  
   <body>
-    <!-- !!! CRITICAL: DO NOT DELETE THESE TWO LINES !!! -->
-    <div id="root"></div>
-    <!-- !!! YOUR WEBSITE LIVES ABOVE THIS LINE !!! -->
+    <!-- 2. REACT APP MOUNT POINT (MUST BE HERE) -->
+    <div id="root" style="position: relative; z-index: 10;"></div>
+    
+    <!-- 3. REACT SCRIPT -->
 
     <!-- ================================================== -->
-    <!-- START: HONEYZEST INTELLIGENT ENVIRONMENT SYSTEM    -->
+    <!-- HONEYZEST ULTIMATE ATMOSPHERE ENGINE (v3.0)        -->
     <!-- ================================================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
 
     <style>
-      /* --- 1. SETTINGS BUTTON (Placed near Nav Bar) --- */
-      #hz-smart-gear {
-        position: fixed; 
-        top: 20px; right: 20px; /* ALIGNS WITH NAV BAR */
-        width: 45px; height: 45px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.4);
+      /* --- GLOBAL FIXES --- */
+      body { margin: 0; overflow-x: hidden; } /* Prevents scrollbars from effects */
+      canvas { pointer-events: none !important; } /* CRITICAL: Allows clicking through rain */
+
+      /* --- GEAR ICON (Top Right) --- */
+      #hz-gear-btn {
+        position: fixed; top: 20px; right: 20px;
+        width: 48px; height: 48px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         cursor: pointer; z-index: 99999;
-        font-size: 22px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
-      #hz-smart-gear:hover { 
-        background: #fff; transform: rotate(180deg) scale(1.1); color: #eab308; 
-      }
+      #hz-gear-btn:hover { transform: rotate(180deg) scale(1.1); background: #fff; color: #eab308; }
 
-      /* --- 2. THE DASHBOARD PANEL --- */
-      #hz-dashboard {
-        position: fixed; top: 75px; right: 20px;
-        width: 320px;
-        background: rgba(20, 20, 20, 0.95); /* Dark Premium Theme */
-        color: #fff;
+      /* --- SETTINGS DASHBOARD --- */
+      #hz-settings-panel {
+        position: fixed; top: 80px; right: 20px;
+        width: 340px;
+        background: #1a1a1a;
+        color: #e5e5e5;
         border-radius: 16px;
-        padding: 0;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid #333;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         z-index: 99998;
-        font-family: 'Inter', system-ui, sans-serif;
-        transform-origin: top right;
+        font-family: system-ui, -apple-system, sans-serif;
         transform: scale(0.9) translateY(-20px);
         opacity: 0; pointer-events: none;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex; flex-direction: column;
+        max-height: 80vh;
       }
-      #hz-dashboard.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+      #hz-settings-panel.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
 
       /* HEADER */
-      .hz-dash-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+      .hz-panel-header {
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #eab308 0%, #b45309 100%);
+        border-radius: 15px 15px 0 0;
         display: flex; justify-content: space-between; align-items: center;
-        background: linear-gradient(90deg, #eab308, #ca8a04); /* Honey Gold */
-        border-radius: 16px 16px 0 0;
       }
-      .hz-dash-header h3 { margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+      .hz-panel-header h3 { margin: 0; font-size: 14px; font-weight: 800; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
+
+      /* BODY SCROLL */
+      .hz-panel-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+
+      /* CONTROLS */
+      .hz-control-group { margin-bottom: 20px; }
+      .hz-label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; margin-bottom: 8px; display: block; }
       
-      /* BODY */
-      .hz-dash-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
-      
-      /* SECTIONS */
-      .hz-group { margin-bottom: 20px; }
-      .hz-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: block; }
-      
-      /* INPUTS */
       .hz-select {
-        width: 100%; padding: 10px; background: #334155; border: 1px solid #475569;
-        color: #fff; border-radius: 8px; font-size: 13px; outline: none; cursor: pointer;
-        -webkit-appearance: none;
-           -moz-appearance: none;
-                appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-        background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 10px auto;
+        width: 100%; background: #262626; color: #fff; border: 1px solid #404040;
+        padding: 10px; border-radius: 8px; font-size: 13px; outline: none; cursor: pointer;
       }
+      .hz-select:focus { border-color: #eab308; }
       .hz-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-      /* TOGGLE SWITCH */
-      .hz-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
-      .hz-toggle-text { font-size: 13px; font-weight: 600; color: #fff; }
-      .hz-toggle-sub { font-size: 10px; color: #22d3ee; display: block; margin-top: 2px; }
-      
-      /* STATUS FOOTER */
-      .hz-dash-footer {
-        padding: 10px 20px; font-size: 10px; color: #64748b; text-align: center;
-        border-top: 1px solid rgba(255,255,255,0.1); background: #0f172a; border-radius: 0 0 16px 16px;
+      /* TOGGLES */
+      .hz-toggle-box {
+        display: flex; justify-content: space-between; align-items: center;
+        background: #262626; padding: 12px; border-radius: 8px; border: 1px solid #333; margin-bottom: 10px;
       }
+      .hz-toggle-title { font-size: 13px; font-weight: 600; }
+      .hz-toggle-desc { font-size: 10px; color: #888; }
+      
+      /* SLIDER */
+      input[type=range] { width: 100%; accent-color: #eab308; cursor: pointer; }
 
-      /* ATMOSPHERE OVERLAYS */
-      .hz-weather-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9997; opacity: 0; transition: opacity 2s ease; }
-      .hz-night { background: linear-gradient(to bottom, rgba(2,6,23,0.8), rgba(0,0,0,0.4)); }
-      .hz-mist { background: rgba(255,255,255,0.15); backdrop-filter: blur(3px); }
-      .hz-flash { background: white; z-index: 9999; opacity: 0; transition: opacity 0.1s; }
-      .active { opacity: 1 !important; }
+      /* OVERLAYS (Night/Mist/Flash) */
+      .hz-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; transition: opacity 1.5s ease; opacity: 0; }
+      .hz-night-mode { background: linear-gradient(to bottom, rgba(5, 10, 30, 0.8), rgba(0,0,0,0.5)); }
+      .hz-mist-mode { background: rgba(200, 220, 255, 0.1); backdrop-filter: blur(2px); }
+      .hz-flash { background: #fff; z-index: 9999; transition: opacity 0.05s; }
+      .hz-visible { opacity: 1 !important; }
     </style>
 
-    <!-- 3. HTML VISUAL ELEMENTS -->
-    <div id="hz-layer-night" class="hz-weather-overlay hz-night"></div>
-    <div id="hz-layer-mist" class="hz-weather-overlay hz-mist"></div>
-    <div id="hz-layer-flash" class="hz-weather-overlay hz-flash"></div>
+    <!-- 4. AUDIO ASSETS (Hidden) -->
+    <audio id="sfx-rain" loop src="https://assets.mixkit.co/active_storage/sfx/2497/2497-preview.mp3"></audio>
+    <audio id="sfx-thunder" src="https://assets.mixkit.co/active_storage/sfx/1273/1273-preview.mp3"></audio>
+    <audio id="sfx-wind" loop src="https://assets.mixkit.co/active_storage/sfx/1483/1483-preview.mp3"></audio>
 
-    <!-- The Gear Icon (Top Right) -->
-    <div id="hz-smart-gear" onclick="toggleDashboard()">⚙️</div>
+    <!-- 5. HTML UI ELEMENTS -->
+    <div id="hz-layer-night" class="hz-overlay hz-night-mode"></div>
+    <div id="hz-layer-mist" class="hz-overlay hz-mist-mode"></div>
+    <div id="hz-layer-flash" class="hz-overlay hz-flash"></div>
 
-    <!-- The Smart Dashboard -->
-    <div id="hz-dashboard">
-      <div class="hz-dash-header">
-        <h3>System Settings</h3>
-        <div style="cursor:pointer;" onclick="toggleDashboard()">✕</div>
+    <div id="hz-gear-btn" onclick="toggleSettings()">⚙️</div>
+
+    <div id="hz-settings-panel">
+      <div class="hz-panel-header">
+        <h3>Atmosphere Engine</h3>
+        <div style="cursor:pointer" onclick="toggleSettings()">✕</div>
       </div>
-      <div class="hz-dash-body">
+      
+      <div class="hz-panel-body">
         
-        <!-- Auto Detect Switch -->
-        <div class="hz-toggle-row">
+        <!-- AUTO MODE SWITCH -->
+        <div class="hz-toggle-box">
           <div>
-            <span class="hz-toggle-text">Smart Auto-Detect</span>
-            <span class="hz-toggle-sub" id="hz-detected-info">Locating...</span>
+            <div class="hz-toggle-title">✨ Smart Auto-Pilot</div>
+            <div class="hz-toggle-desc" id="hz-location-status">Detecting...</div>
           </div>
-          <input type="checkbox" id="hz-auto-check" checked onchange="toggleAutoMode(this.checked)" style="width:18px; height:18px; cursor:pointer;">
+          <input type="checkbox" id="hz-auto-switch" checked onchange="toggleAuto(this.checked)" style="width:18px; height:18px;">
         </div>
 
-        <!-- Weather Control -->
-        <div class="hz-group">
-          <label class="hz-label">Live Atmosphere</label>
-          <select id="hz-weather-select" class="hz-select" onchange="manualOverride()" disabled>
-            <option value="clear">☀️ Sunny / Clear</option>
-            <option value="rain">🌧️ Heavy Rain</option>
-            <option value="drizzle">🌦️ Light Drizzle</option>
-            <option value="thunder">⚡ Thunderstorm</option>
+        <!-- INTENSITY SLIDER -->
+        <div class="hz-control-group">
+          <label class="hz-label">Effect Intensity</label>
+          <input type="range" id="hz-intensity" min="10" max="200" value="80" oninput="manualUpdate()">
+        </div>
+
+        <!-- SOUND TOGGLE -->
+        <div class="hz-toggle-box">
+          <div>
+            <div class="hz-toggle-title">🔊 Immersive Sound</div>
+            <div class="hz-toggle-desc">Rain & Wind Ambience</div>
+          </div>
+          <input type="checkbox" id="hz-sound-switch" onchange="toggleSound(this.checked)" style="width:18px; height:18px;">
+        </div>
+
+        <!-- WEATHER SELECTOR -->
+        <div class="hz-control-group">
+          <label class="hz-label">Weather Mode</label>
+          <select id="hz-weather-select" class="hz-select" onchange="manualUpdate()" disabled>
+            <option value="clear">☀️ Clear / Sunny</option>
+            <option value="rain">🌧️ Rain Shower</option>
+            <option value="thunder">⚡ Heavy Thunderstorm</option>
             <option value="snow">❄️ Snowfall</option>
             <option value="wind">🍃 Windy / Storm</option>
-            <option value="mist">🌫️ Foggy / Mist</option>
-            <option value="night">🌙 Clear Night</option>
+            <option value="mist">🌫️ Fog / Mist</option>
+            <option value="confetti">🎉 Celebration / Party</option>
+            <option value="halloween">🎃 Halloween</option>
+            <option value="love">❤️ Valentine's / Love</option>
           </select>
         </div>
 
-        <!-- Currency Control -->
-        <div class="hz-group">
-          <label class="hz-label">Currency</label>
-          <select id="hz-currency-select" class="hz-select" onchange="manualOverride()" disabled>
+        <!-- CURRENCY & LANGUAGE -->
+        <div class="hz-control-group">
+          <label class="hz-label">Regional Settings</label>
+          <select id="hz-currency-select" class="hz-select" onchange="manualUpdate()" disabled style="margin-bottom:8px;">
             <optgroup label="Popular">
-              <option value="KES">🇰🇪 KES - Kenyan Shilling</option>
-              <option value="USD">🇺🇸 USD - US Dollar</option>
-              <option value="GBP">🇬🇧 GBP - British Pound</option>
-              <option value="EUR">🇪🇺 EUR - Euro</option>
-            </optgroup>
-            <optgroup label="Africa">
-              <option value="NGN">🇳🇬 NGN - Nigerian Naira</option>
-              <option value="ZAR">🇿🇦 ZAR - South African Rand</option>
-              <option value="GHS">🇬🇭 GHS - Ghanaian Cedi</option>
-              <option value="UGX">🇺🇬 UGX - Ugandan Shilling</option>
-              <option value="TZS">🇹🇿 TZS - Tanzanian Shilling</option>
+              <option value="KES">🇰🇪 KES (Kenya)</option>
+              <option value="USD">🇺🇸 USD (USA)</option>
+              <option value="EUR">🇪🇺 EUR (Europe)</option>
+              <option value="GBP">🇬🇧 GBP (UK)</option>
             </optgroup>
             <optgroup label="Global">
-              <option value="AED">🇦🇪 AED - UAE Dirham</option>
-              <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
-              <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
-              <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
-              <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
-              <option value="INR">🇮🇳 INR - Indian Rupee</option>
+              <option value="NGN">🇳🇬 NGN (Nigeria)</option>
+              <option value="ZAR">🇿🇦 ZAR (South Africa)</option>
+              <option value="GHS">🇬🇭 GHS (Ghana)</option>
+              <option value="INR">🇮🇳 INR (India)</option>
+              <option value="AED">🇦🇪 AED (Dubai)</option>
+              <option value="CNY">🇨🇳 CNY (China)</option>
+              <option value="JPY">🇯🇵 JPY (Japan)</option>
             </optgroup>
           </select>
-        </div>
-
-        <!-- Language Control -->
-        <div class="hz-group">
-          <label class="hz-label">Language</label>
-          <select id="hz-lang-select" class="hz-select" onchange="manualOverride()" disabled>
-            <option value="en">English (UK/US)</option>
-            <option value="sw">Kiswahili (Swahili)</option>
-            <option value="fr">Français (French)</option>
-            <option value="de">Deutsch (German)</option>
-            <option value="es">Español (Spanish)</option>
-            <option value="ar">العربية (Arabic)</option>
-            <option value="zh">中文 (Chinese)</option>
-            <option value="hi">हिन्दी (Hindi)</option>
+          
+          <select id="hz-lang-select" class="hz-select" onchange="manualUpdate()" disabled>
+            <option value="en">English</option>
+            <option value="sw">Swahili</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="es">Spanish</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
           </select>
         </div>
 
-      </div>
-      <div class="hz-dash-footer">
-        Powered by HoneyZest Smart AI
       </div>
     </div>
 
-    <!-- 4. INTELLIGENT SCRIPT -->
+    <!-- 6. ENGINE SCRIPT -->
     <script>
-      // === CONFIGURATION ===
+      // === API & CONFIG ===
       const API_KEY = "cbcace2f2fd0530b63a92e3cd2ed6fe0";
-      // React Elements to Bounce Off (Nav, Buttons, Cards)
-      const BOUNCE_TARGETS = ".btn, button, input, .card, img, nav, header, .logo, a";
+      const BOUNCE_TARGETS = "button, .btn, input[type='submit'], .card, img, nav, .logo, a";
 
       let tsInstance;
-      let thunderInterval;
+      let thunderTimer;
+      let currentTheme = 'clear';
 
-      // === 1. UI FUNCTIONS ===
-      function toggleDashboard() {
-        document.getElementById('hz-dashboard').classList.toggle('active');
+      // === UI FUNCTIONS ===
+      function toggleSettings() {
+        document.getElementById('hz-settings-panel').classList.toggle('active');
       }
 
-      function toggleAutoMode(isAuto) {
-        // Enable/Disable Selects
-        document.getElementById('hz-weather-select').disabled = isAuto;
-        document.getElementById('hz-currency-select').disabled = isAuto;
-        document.getElementById('hz-lang-select').disabled = isAuto;
-
+      function toggleAuto(isAuto) {
+        const els = ['hz-weather-select', 'hz-currency-select', 'hz-lang-select'];
+        els.forEach(id => document.getElementById(id).disabled = isAuto);
+        
         if (isAuto) {
           runAutoDetect();
         } else {
-          document.getElementById('hz-detected-info').innerText = "Manual Override Mode";
+          document.getElementById('hz-location-status').innerText = "Manual Control Mode";
+          manualUpdate();
         }
       }
 
-      function manualOverride() {
-        const w = document.getElementById('hz-weather-select').value;
-        const c = document.getElementById('hz-currency-select').value;
-        const l = document.getElementById('hz-lang-select').value;
+      function toggleSound(enabled) {
+        if(!enabled) {
+          document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+        } else {
+          manualUpdate(); // Restart sounds based on current weather
+        }
+      }
+
+      function manualUpdate() {
+        const weather = document.getElementById('hz-weather-select').value;
+        const curr = document.getElementById('hz-currency-select').value;
+        const lang = document.getElementById('hz-lang-select').value;
+        const intensity = document.getElementById('hz-intensity').value;
+
+        applyTheme(weather, intensity);
         
-        loadWeatherTheme(w);
-        savePreferences(c, l);
+        // Save prefs for React app to read
+        localStorage.setItem('hz_currency', curr);
+        localStorage.setItem('hz_lang', lang);
       }
 
-      function savePreferences(curr, lang) {
-        localStorage.setItem('honeyzest_currency', curr);
-        localStorage.setItem('honeyzest_lang', lang);
-        console.log("Settings Saved:", curr, lang);
-      }
-
-      // === 2. PARTICLE ENGINE (PHYSICS) ===
-      function getParticleConfig(type) {
-        const config = {
-          fullScreen: { enable: true, zIndex: 9996 }, // Just behind the modal
+      // === PHYSICS ENGINE ===
+      function getBaseConfig() {
+        return {
+          fullScreen: { enable: true, zIndex: 1 }, // Changed to 1 (Low) to fix white screen
           fpsLimit: 60,
+          background: { color: "transparent" }, // CRITICAL FIX FOR WHITE SCREEN
           particles: { move: { enable: true } },
           interactivity: {
             detectsOn: "window",
@@ -250,101 +260,113 @@
             }
           }
         };
-
-        // Reset Effects
-        clearInterval(thunderInterval);
-        document.getElementById('hz-layer-mist').classList.remove('active');
-        document.getElementById('hz-layer-night').classList.remove('active');
-
-        switch(type) {
-          case 'rain':
-          case 'thunder':
-            config.particles = {
-              number: { value: 120 }, color: { value: "#63a4ff" }, shape: { type: "line" },
-              opacity: { value: 0.7 }, size: { value: { min: 1, max: 2 } },
-              move: { enable: true, speed: 22, direction: "bottom", gravity: { enable: true, acceleration: 20 }, straight: true }
-            };
-            if(type === 'thunder') startThunder();
-            break;
-          case 'drizzle':
-            config.particles = {
-              number: { value: 60 }, color: { value: "#a2d2ff" }, shape: { type: "line" },
-              opacity: { value: 0.5 }, size: { value: { min: 0.5, max: 1 } },
-              move: { enable: true, speed: 10, direction: "bottom", gravity: { enable: true, acceleration: 5 } }
-            };
-            break;
-          case 'snow':
-            config.particles = {
-              number: { value: 80 }, color: { value: "#fff" }, shape: { type: "circle" },
-              opacity: { value: 0.9 }, size: { value: { min: 2, max: 5 } },
-              move: { enable: true, speed: 3, direction: "bottom", random: true }
-            };
-            break;
-          case 'wind':
-            config.particles = {
-              number: { value: 40 }, color: { value: ["#5e3a07", "#2f4f2f", "#8b5a2b"] },
-              shape: { type: "polygon", options: { polygon: { sides: 3 } } },
-              opacity: { value: 1 }, size: { value: { min: 3, max: 6 } },
-              move: { enable: true, speed: 35, direction: "right" }
-            };
-            break;
-          case 'mist':
-            document.getElementById('hz-layer-mist').classList.add('active');
-            config.particles = { number: { value: 0 } }; // No particles, just CSS fog
-            break;
-          case 'night':
-            document.getElementById('hz-layer-night').classList.add('active');
-            config.particles = {
-              number: { value: 30 }, color: { value: "#fff" }, shape: { type: "star" },
-              opacity: { value: 0.8 }, size: { value: { min: 1, max: 3 } },
-              move: { enable: true, speed: 0.2, direction: "none", random: true }
-            };
-            break;
-          default: // Clear/Sunny
-            config.particles = {
-              number: { value: 20 }, color: { value: "#FFD700" }, shape: { type: "circle" },
-              opacity: { value: 0.4 }, size: { value: { min: 1, max: 3 } },
-              move: { enable: true, speed: 1, direction: "none", random: true }
-            };
-        }
-        return config;
       }
 
-      async function loadWeatherTheme(theme) {
-        const config = getParticleConfig(theme);
+      async function applyTheme(type, intensity = 80) {
+        currentTheme = type;
+        const config = getBaseConfig();
+        const soundSwitch = document.getElementById('hz-sound-switch').checked;
+
+        // Reset Effects
+        clearInterval(thunderTimer);
+        document.getElementById('hz-layer-mist').classList.remove('hz-visible');
+        document.getElementById('hz-layer-night').classList.remove('hz-visible');
+        ['sfx-rain', 'sfx-wind'].forEach(id => document.getElementById(id).pause());
+
+        // 1. RAIN / THUNDER
+        if (type === 'rain' || type === 'thunder') {
+          config.particles = {
+            number: { value: intensity },
+            color: { value: "#a2d2ff" },
+            shape: { type: "line" },
+            opacity: { value: 0.7 },
+            size: { value: { min: 1, max: 3 } },
+            move: { enable: true, speed: 20, direction: "bottom", gravity: { enable: true, acceleration: 15 }, straight: true }
+          };
+          if (soundSwitch) document.getElementById('sfx-rain').play();
+          if (type === 'thunder') startThunder(soundSwitch);
+        }
+        
+        // 2. SNOW
+        else if (type === 'snow') {
+          config.particles = {
+            number: { value: intensity / 2 },
+            color: { value: "#fff" },
+            shape: { type: "circle" },
+            opacity: { value: 0.9 },
+            size: { value: { min: 2, max: 6 } },
+            move: { enable: true, speed: 3, direction: "bottom", random: true }
+          };
+        }
+
+        // 3. WIND / STORM
+        else if (type === 'wind') {
+          config.particles = {
+            number: { value: 40 },
+            color: { value: ["#5e3a07", "#2f4f2f", "#8b5a2b"] },
+            shape: { type: "polygon", options: { polygon: { sides: 3 } } },
+            opacity: { value: 1 }, size: { value: { min: 3, max: 6 } },
+            move: { enable: true, speed: 35, direction: "right" }
+          };
+          if (soundSwitch) document.getElementById('sfx-wind').play();
+        }
+
+        // 4. SPECIAL MODES
+        else if (type === 'confetti') {
+          config.particles = {
+            number: { value: 80 },
+            color: { value: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00"] },
+            shape: { type: ["circle", "square"] },
+            move: { enable: true, speed: 10, direction: "bottom", outModes: "out" }
+          };
+        }
+        else if (type === 'halloween') {
+          config.particles = {
+            number: { value: 30 }, color: { value: "#000" },
+            shape: { type: "image", image: { src: "https://particles.js.org/images/fruits/bat.png", width: 100, height: 100 } },
+            size: { value: 20 }, move: { speed: 10, direction: "right", random: true }
+          };
+        }
+        else if (type === 'love') {
+           config.particles = {
+            number: { value: 40 }, color: { value: "#ff0000" },
+            shape: { type: "heart" }, size: { value: 10 },
+            move: { speed: 2, direction: "top", random: true }
+          };
+        }
+        
+        // 5. MIST
+        else if (type === 'mist') {
+          document.getElementById('hz-layer-mist').classList.add('hz-visible');
+          config.particles = { number: { value: 0 } };
+        }
+
+        // 6. CLEAR
+        else {
+           config.particles = {
+            number: { value: 15 }, color: { value: "#FFD700" },
+            shape: { type: "circle" }, opacity: { value: 0.3 },
+            move: { speed: 1, direction: "none", random: true }
+          };
+        }
+
+        // RELOAD ENGINE
         if (tsInstance) { await tsInstance.load("tsparticles", config); }
         else { tsInstance = await tsParticles.load("tsparticles", config); }
       }
 
-      function startThunder() {
-        thunderInterval = setInterval(() => {
-          if(Math.random() > 0.9) { 
+      function startThunder(playSound) {
+        thunderTimer = setInterval(() => {
+          if(Math.random() > 0.85) { // Flash chance
             const flash = document.getElementById('hz-layer-flash');
-            flash.style.opacity = 0.8;
-            setTimeout(() => { flash.style.opacity = 0; }, 100);
+            flash.classList.add('hz-visible');
+            if(playSound) document.getElementById('sfx-thunder').play();
+            setTimeout(() => flash.classList.remove('hz-visible'), 150);
           }
-        }, 1200);
+        }, 2000);
       }
 
-      // === 3. INTELLIGENT MAPPING SYSTEM ===
-      const COUNTRY_MAP = {
-        'KE': { curr: 'KES', lang: 'sw' }, // Kenya
-        'TZ': { curr: 'TZS', lang: 'sw' }, // Tanzania
-        'UG': { curr: 'UGX', lang: 'en' }, // Uganda
-        'NG': { curr: 'NGN', lang: 'en' }, // Nigeria
-        'GH': { curr: 'GHS', lang: 'en' }, // Ghana
-        'ZA': { curr: 'ZAR', lang: 'en' }, // South Africa
-        'US': { curr: 'USD', lang: 'en' },
-        'GB': { curr: 'GBP', lang: 'en' },
-        'AE': { curr: 'AED', lang: 'ar' },
-        'CN': { curr: 'CNY', lang: 'zh' },
-        'JP': { curr: 'JPY', lang: 'en' }, // Japan often uses En for foreigners
-        'IN': { curr: 'INR', lang: 'hi' },
-        'FR': { curr: 'EUR', lang: 'fr' },
-        'DE': { curr: 'EUR', lang: 'de' },
-        'ES': { curr: 'EUR', lang: 'es' }
-      };
-
+      // === AUTO DETECT LOGIC ===
       function runAutoDetect() {
         if (!navigator.geolocation) return;
         
@@ -354,48 +376,49 @@
             const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
             const data = await res.json();
             
-            // 1. Identify Country & Defaults
-            const countryCode = data.sys.country;
-            const defaults = COUNTRY_MAP[countryCode] || { curr: 'USD', lang: 'en' };
+            // Country Logic
+            const code = data.sys.country;
+            document.getElementById('hz-location-status').innerText = `Live in ${data.name}, ${code}`;
             
-            // 2. Update Status UI
-            document.getElementById('hz-detected-info').innerHTML = `Detected: ${data.name}, ${countryCode}`;
+            // Map Currency
+            let c = 'USD'; let l = 'en';
+            if(code === 'KE') { c = 'KES'; l = 'sw'; }
+            else if(code === 'NG') c = 'NGN';
+            else if(code === 'ZA') c = 'ZAR';
+            else if(['GB','UK'].includes(code)) c = 'GBP';
+            else if(['FR','DE','IT','ES'].includes(code)) c = 'EUR';
             
-            // 3. Set Dropdowns
-            document.getElementById('hz-currency-select').value = defaults.curr;
-            document.getElementById('hz-lang-select').value = defaults.lang;
-            savePreferences(defaults.curr, defaults.lang);
+            document.getElementById('hz-currency-select').value = c;
+            document.getElementById('hz-lang-select').value = l;
 
-            // 4. Set Weather
+            // Weather Logic
             const id = data.weather[0].id;
-            const main = data.weather[0].main.toLowerCase();
             let theme = 'clear';
-
-            const isNight = (data.dt > data.sys.sunset || data.dt < data.sys.sunrise);
-
             if (id >= 200 && id <= 232) theme = 'thunder';
-            else if (id >= 300 && id <= 321) theme = 'drizzle';
-            else if (id >= 500 && id <= 531) theme = 'rain';
+            else if (id >= 300 && id <= 531) theme = 'rain';
             else if (id >= 600 && id <= 622) theme = 'snow';
             else if (id >= 700 && id <= 781) theme = 'mist';
             else if (data.wind.speed > 10) theme = 'wind';
-            else if (isNight && main.includes('clear')) theme = 'night';
+            
+            // Night Check
+            const isNight = (data.dt > data.sys.sunset || data.dt < data.sys.sunrise);
+            if(isNight) document.getElementById('hz-layer-night').classList.add('hz-visible');
+            else document.getElementById('hz-layer-night').classList.remove('hz-visible');
 
             document.getElementById('hz-weather-select').value = theme;
-            loadWeatherTheme(theme);
+            applyTheme(theme);
 
-          } catch (e) { console.error("Auto Detect Failed", e); }
+          } catch (e) { console.error(e); }
         });
       }
 
-      // === 4. STARTUP ===
+      // === STARTUP ===
       window.onload = () => {
-        // Wait 2 seconds for React to mount the Nav Bar and Buttons
+        // Run after 2 seconds to allow React to mount
         setTimeout(() => {
-          runAutoDetect();
+          if(document.getElementById('hz-auto-switch').checked) runAutoDetect();
         }, 2000);
       };
-
     </script>
   </body>
 </html>
